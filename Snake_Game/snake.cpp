@@ -1,17 +1,19 @@
 #include<iostream>
-#include<conio.h>
+#include</home/eddayfy/Documents/C++/Snake_Game/conio.h>
 
 using namespace std;
 
-int table_width = 30,table_height = 15,Sheadx = table_width/2,Sheady = table_height/2,Score = -1,fruitx,fruity,Snake_Tail = 0,Snake_Tail_x[30],Snake_Tail_y[30];
+int table_width = 30,table_height = 15,Sheadx = table_width/2,Sheady = table_height/2,Score = 0,fruitx,fruity,Snake_Tail = 0,Snake_Tail_x[100],Snake_Tail_y[100];
 char head = '>',c;
 
-void Shift_Right(int arr[], int size) {
-    for (int i = size - 2; i >= 0; i--) {
-        arr[i+1] = arr[i];
-    }   
+void Move_Tail() {
+    for (int i = Snake_Tail; i >= 0; i--) {
+        Snake_Tail_x[i] = Snake_Tail_x[i-1];
+        Snake_Tail_y[i] = Snake_Tail_y[i-1];
+    }
+    Snake_Tail_x[0] = Sheadx;
+    Snake_Tail_y[0] = Sheady;
 }
-
 void Generate_Fruit() {
     srand(time(NULL));
     fruitx = rand() % (table_width - 2) + 1;
@@ -39,33 +41,29 @@ void Draw() {
         cout<<endl;
     }
     cout<<"Your Score: "<<Score<<endl;
-    
 }
 void Move() {
     if (_kbhit()) {
         c = getch();
-        if (c == 120) {
-            c = 'x';
-        }
-        else if (c == '\033') {
+        if (c == '\033') {
             getch();
             switch(getch()) {
-                case 'A':
-                    c = 'w';
-                    break;
-                case 'B':
-                    c = 's';
-                    break;
-                case 'C':
-                    c = 'd';
-                    break;
-                case 'D':
-                    c = 'a';
-                    break;
+            case 'A':
+                c = 'w';
+                break;
+            case 'B':
+                c = 's';
+                break;
+            case 'C':
+                c = 'd';
+                break;
+            case 'D':
+                c = 'a';
+                break;
             }
         }
     }
-    
+
     if (c == 'w') {
         Sheady -= 1;
         head = '^';
@@ -82,27 +80,26 @@ void Move() {
         Sheadx += 1;
         head = '>';
     }
-    else if (c == 'p') {
-        system("read");
-    }
     else if (c == 'x') {
         exit(0);
-    } 
-
-    Shift_Right(Snake_Tail_x,30);
-    Shift_Right(Snake_Tail_y,30);
-    Snake_Tail_x[0] = Sheadx;
-    Snake_Tail_y[0] = Sheady;
+    }
 
     if (Sheadx == fruitx && Sheady == fruity) {
         Score++;
         Snake_Tail++;
         Generate_Fruit();
     }
+    Move_Tail();
 }
-void Check_Lose() {
-    if (Sheadx == table_width-1 || Sheadx == 0) exit(0);
-    else if (Sheady == table_height-1 || Sheady == 0) exit(0);
+int Check_Lose() {
+    if (Sheadx == table_width-1 || Sheadx == 0) return 1;
+    else if (Sheady == table_height-1 || Sheady == 0) return 1;
+    else {
+        for (int i = 1; i < Snake_Tail; i++) {
+            if (Sheadx == Snake_Tail_x[i] && Sheady == Snake_Tail_y[i]) return 1;
+        }
+    }
+    return 0;
 }
 
 int main() {
@@ -110,7 +107,7 @@ int main() {
     while (true) {
         Draw();
         Move();
-        Check_Lose();
+        if (Check_Lose() == 1) break;
         system("sleep 0.3");
         system("clear");
     }
